@@ -22,17 +22,18 @@ class Bilibili_Spider(Spider):
 		print u'开始============================================='
 		yield Request(self.url,headers =self.headers)
 	def parse(self,response):
-		soup = BeautifulSoup(response.body)
-		results = soup.find_all('li',attrs={'class':'nav-item'})
+		results = response.xpath("//*[@class='nav-item']")
 		
 		for result in results:
-			print result
-			soup1 = BeautifulSoup(result)
-			details = soup.find_all('a')
+			print result.extract()
+			soup = BeautifulSoup(result.extract())
+			details = soup.find_all('li',attrs={'class':'sub-nav-item'})
+			
 			print details
 			print '\n'
 			for detail in details:
-				detail_url = detail
+				detail_url = detail.a['href']
+				print detail_url
 				next_url = self.url + detail_url
 				print next_url
 				self.parse_second(next_url)
