@@ -4,35 +4,41 @@ from scrapy.spiders import Spider
 from scrapy2.items import BilibiliItem
 from selenium import webdriver
 import sys
+from bs4 import BeautifulSoup
+reload(sys)
+sys.setdefaultencoding('utf8')
 from selenium.webdriver.common.action_chains import ActionChains
 class Bilibili_Spider(Spider):
-	count = 0
 	name = 'bili'
-	url = 'https://www.bilibili.com/'
+	url = 'https://www.bilibili.com'
 	headers = {
 		'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
 	}
-	item = TaobaoItem()
+	item = BilibiliItem()
 	def start_requests(self):
 		fo = open('bilibili.log','w')
 		sys.stdout = fo
-		print url
+		print self.url
 		print u'开始============================================='
-		yield Request(url,headers =self.headers)
+		yield Request(self.url,headers =self.headers)
 	def parse(self,response):
-		html = response.body
-		results = html.xpath("//*[@class='nav-item']")
+		soup = BeautifulSoup(response.body)
+		results = soup.find_all('li',attrs={'class':'nav-item'})
+		
 		for result in results:
-			type = result.xpath("/a/div[2]/text()").extract()
-			details = result.xpath("/ul/li[1]/a)
-			self.item['type'] = type
+			print result
+			soup1 = BeautifulSoup(result)
+			details = soup.find_all('a')
+			print details
+			print '\n'
 			for detail in details:
-				detail_url = detail.xpath("/@href").extract().encode('utf-8')
-				detail_type = detail.xpath("/span/text()").extract()
-				self.item['detail_type'] = detail_type
+				detail_url = detail
 				next_url = self.url + detail_url
 				print next_url
 				self.parse_second(next_url)
+				print 'comlete one detail============================================'
+			print 'comlete one type++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+		print 'comlete all types############################################'
 	def parse_second(self,url):
 		service_args=[]
 		service_args.append('--load-images=no')  ##关闭图片加载
@@ -82,7 +88,9 @@ class Bilibili_Spider(Spider):
 			print Barrage
 			self.item['Barrage'] = Barrage
 			#在线观看人数
-			online_num = scrapy.Field()
+			online_num = browser.find_element_by_xpath("//*[@class='bilibili-player-watching-number']").text
+			print online_num
+			self.item['online_num'] = online_num
 			#收藏量stow_count
 			collection = browser.find_element_by_xpath("//*[@id='stow_count']").text
 			print collection
@@ -92,11 +100,14 @@ class Bilibili_Spider(Spider):
 			print coin_num
 			self.item['coin_num'] = coin_num
 			#视频时长
-			video_time = scrapy.Field()
+			video_time = browser.find_element_by_xpath("//*[@class='bilibili-player-video-time-total']").text
+			print video_time
+			self.item['video_time'] = video_time
 			#投稿时间
 			Submission_time = self.item['coin_num'] = browser.find_element_by_xpath("//*[@itemprop='startDate']/i").text
 			print Submission_time
 			self.item['Submission_time'] = Submission_time
+			yield item
 			
 			
 			
