@@ -13,13 +13,29 @@ BOT_NAME = 'scrapy2'
 
 SPIDER_MODULES = ['scrapy2.spiders']
 NEWSPIDER_MODULE = 'scrapy2.spiders'
-
+FEED_EXPORTERS = {
+    'csv': 'scrapy2.csv_order.MyProjectCsvItemExporter',
+} 
+FIELDS_TO_EXPORT = [
+    'type',
+    'detail_type',
+    'ranking',
+    'video_name',
+	'UP_name',
+	'video_view',
+	'collection_or_zhuifan',
+	'Barrage',
+	'coin_num',
+	'online_num',
+	'video_time',
+	'Submission_time'
+]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrapy2 (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

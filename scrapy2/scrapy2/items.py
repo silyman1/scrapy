@@ -32,7 +32,7 @@ class BilibiliItem(scrapy.Item):
 	#在线观看人数
 	online_num = scrapy.Field()
 	#收藏量
-	collection = scrapy.Field()
+	collection_or_zhuifan = scrapy.Field()
 	#硬币数量
 	coin_num = scrapy.Field()
 	#视频时长
