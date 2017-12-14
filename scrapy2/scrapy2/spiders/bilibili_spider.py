@@ -11,6 +11,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 from selenium.webdriver.common.action_chains import ActionChains
 class Bilibili_Spider(Spider):
+	count = 0
+	error_num = 0
 	name = 'bili'
 	url = 'https://www.bilibili.com'
 	headers = {
@@ -44,7 +46,7 @@ class Bilibili_Spider(Spider):
 			self.item['ranking'] = str(ranking)
 			#item['video_name'] = videos[i].text
 			ActionChains(browser).click_and_hold(videos[i])
-			time.sleep(2)
+			time.sleep(3)
 			#UP_name = browser.find_element_by_xpath("//*[@class='usname']/a[1]").text
 			#video_view = browser.find_element_by_xpath("//*[@id='dianji']").text
 			#详细类型`
@@ -117,29 +119,38 @@ class Bilibili_Spider(Spider):
 				service_args.append('--ssl-protocol=any')
 				#browser=webdriver.PhantomJS(service_args=service_args)#PhantomJS
 				browser = webdriver.Chrome()
+				browser.maximize_window()
 				print 'begin=================================second!!!!'
 				browser.get(next_url)
 				time.sleep(2)
+				browser.refresh()
+				time.sleep(3)
+				target = browser.find_element_by_xpath("//*[@class='name']")
+				browser.execute_script("arguments[0].scrollIntoView();", target) #拖动到可见的元素去
 				#browser.save_screenshot('E:\\gitprojects\\scrapy\\1111.png')
 				print browser.current_window_handle
 				print 'complete=================================second!!!!'
 		#third_urls= browser.find_elements_by_xpath("//*[@class='rank-list hot-list']//li/a").get_attribute("href")
 		#video_names = browser.find_elements_by_xpath("//*[@class='rank-list hot-list']//li/a/div[2]/p[1]").text
 				videos = browser.find_elements_by_xpath("//*[@class='ri-title']")
-				test_helps =browser.find_elements_by_xpath("//*[@class='ri-num']")
+				test_help =browser.find_element_by_xpath("//*[@class='ri-num']")
+				print videos
+				print test_help
 				if videos is []:
 					break
 				for i in range(0,5):
+					self.count +=1
 					ranking = i + 1
 					self.item['ranking'] = str(ranking)
 					#item['video_name'] = videos[i].text
 					#ActionChains(browser).click_and_hold(videos[i])
+					#browser.save_screenshot('E:\\gitprojects\\scrapy\\1111.png')
 					try:
-						test_helps[i].click()
+						test_help.click()
 						videos[i].click()
 					except:
-						print '出错了'
-						break
+						print '出错了！！！'
+						self.error_num += 1
 					time.sleep(3)
 					now_handle = browser.current_window_handle #获取当前窗口句柄
 					print now_handle   #输出当前获取的窗口句柄
@@ -212,12 +223,15 @@ class Bilibili_Spider(Spider):
 					self.item['Submission_time'] = Submission_time
 					browser.close()
 					print now_handle
-					browser.switch_to_window(now_handle) 
+					browser.switch_to_window(now_handle)
+					#browser.refresh()
 					print 'ok'
 					yield self.item
+					time.sleep(1)
 				browser.quit()
 				print 'comlete one detail============================================'
 			print 'comlete one type++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 		print 'comlete all types############################################'
-		
+		print '总计数为',self.count
+		print '错误数为',self.error_num
 
