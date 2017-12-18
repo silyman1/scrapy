@@ -48,6 +48,8 @@ class Bilibili_Spider(Spider):
 				#过滤一些不是我们所想要的连接
 				flag1 = re.search('bilibili',detail_url)
 				flag2 = re.search('bangumi',detail_url)
+				if flag1:
+					next_url = detail_url
 				if flag1 and flag2:
 					print '此处无有用信息'
 					continue
@@ -69,7 +71,10 @@ class Bilibili_Spider(Spider):
 				#刷新页面，避免浮窗挡住我们所要的元素
 				browser.refresh()
 				time.sleep(3)
-				target = browser.find_element_by_xpath("//*[@class='name']")
+				try:
+					target = browser.find_element_by_xpath("//*[@class='name']")
+				except:
+					pass
 				browser.execute_script("arguments[0].scrollIntoView();", target) #下拉浏览器时要获取的元素都呈现出来
 				
 				#browser.save_screenshot('E:\\gitprojects\\scrapy\\1111.png')
@@ -78,9 +83,9 @@ class Bilibili_Spider(Spider):
 				print 'complete=================================second!!!!'
 
 				videos = browser.find_elements_by_xpath("//*[@class='ri-title']")#获取热度排行榜的视频元素
-				test_help =browser.find_element_by_xpath("//*[@class='name']")#此元素用来辅助，用于点击避免屏幕失去焦点
+				#test_help =browser.find_element_by_xpath("//*[@class='name']")#此元素用来辅助，用于点击避免屏幕失去焦点
 				print videos
-				print test_help
+				#print test_help
 				if videos is []:
 					return
 				#获取热度版排名前五的元素
@@ -89,7 +94,7 @@ class Bilibili_Spider(Spider):
 					ranking = i + 1
 					#browser.save_screenshot('E:\\gitprojects\\scrapy\\1111.png')
 					try:
-						test_help.click()
+						#test_help.click()
 						videos[i].click()
 					except:
 						print '出错了！！！'
